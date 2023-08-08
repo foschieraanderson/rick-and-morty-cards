@@ -25,10 +25,15 @@ const mountElement = (elem) => {
     main.appendChild(card);
 }
 
-const getResponse = async (url) => {
+const getResponse = async (url, page = 1) => {
+
+    const endpoint = page <= 1 ? url : `${url}/?page=${page}`
+
+    const loader = document.querySelector(".container-loader");
+    loader.classList.toggle('hide');
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(endpoint);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -40,11 +45,16 @@ const getResponse = async (url) => {
 
     } catch (error) {
         console.log('Error: ', error);
-    }
+    } finally {
+        setTimeout(() => {
+            loader.classList.toggle('hide');
+        }, 1000);
+    };
+
 };
 
 (() => {
-    const BaseURL = 'https://rickandmortyapi.com/api/character'
+    const BaseURL = "https://rickandmortyapi.com/api/character";
     getResponse(BaseURL);
 
 })();
