@@ -1,6 +1,8 @@
-const mountElement = (elem) => {
-    const main = document.querySelector('main');
+const BaseURL = "https://rickandmortyapi.com/api/character";
+const loader = document.querySelector(".container-loader");
+const main = document.querySelector('main');
 
+const mountElement = (elem) => {
     // Create elements
     const card = document.createElement("div");
     const cardContent = document.createElement("div");
@@ -25,11 +27,15 @@ const mountElement = (elem) => {
     main.appendChild(card);
 }
 
-const getResponse = async (url, page = 1) => {
+const renderElement = (elements) => {
+    elements.results.map(elem => {
+        mountElement(elem);
+    });
+}
+
+const loadCards = async (url, page = 1) => {
 
     const endpoint = page <= 1 ? url : `${url}/?page=${page}`
-
-    const loader = document.querySelector(".container-loader");
     loader.classList.toggle('hide');
 
     try {
@@ -39,9 +45,7 @@ const getResponse = async (url, page = 1) => {
         }
         const data = await response.json();
 
-        data.results.map(elem => {
-            mountElement(elem);
-        });
+        return data
 
     } catch (error) {
         console.log('Error: ', error);
@@ -53,9 +57,40 @@ const getResponse = async (url, page = 1) => {
 
 };
 
-(() => {
-    const BaseURL = "https://rickandmortyapi.com/api/character";
-    getResponse(BaseURL);
+const observeLastCard = (observer) => {
+    const lastCard = main.lastChild
+    observer.observe(lastCard)
+}
+
+const handleNextCards = () => {
+    let page = 2
+    const cardsObserver = new IntersectionObserver(async ([lastCard], observer) => {
+        if (!lastCard.isIntersecting) {
+            return
+        }
+        observer.unobserve(lastCard.target);
+
+        cards = await loadCards(BaseURL, page);
+        
+        if (!cards) {
+            return
+        }
+        
+        renderElement(cards)
+        observeLastCard(cardsObserver);
+        page += 1
+
+    }, {rootMargin: '300px'})
+
+    observeLastCard(cardsObserver);
+}
+
+(async () => {
+
+    cards = await loadCards(BaseURL);
+    renderElement(cards);
+
+    await handleNextCards();
 
 })();
 
