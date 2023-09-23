@@ -22,7 +22,6 @@ body {
         linear-gradient(to bottom right, #000 15%, transparent),
         radial-gradient(circle at 100% 0%, rgba(255,255,255,.2) 10%, transparent 20%) center center / 15px 15px,
         linear-gradient(to bottom right, #000, #333);
-    position: relative;
 }
 
 header {
@@ -137,10 +136,9 @@ footer a {
     align-items: center;
     justify-content: center;
     position: fixed;
-    z-index: 5;
+    z-index: 2;
     top: 0;
     left: 0;
-    transition: opacity .5s ease-in-out;
 }
 
 .loader {
@@ -178,9 +176,9 @@ footer a {
 }
 
 .show {
-    opacity: 1;
+    visibility: visible;
 }
 
 .hide {
-    opacity: 0;
+    visibility: hidden;
 }
