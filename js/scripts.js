@@ -22,12 +22,18 @@ const mountElement = (elem) => {
     card.appendChild(cardFooter);
 
     // Add new element
+    card.setAttribute("data-id", elem.id)
     cardImage.src = elem.image;
     cardTitle.textContent = elem.name;
     main.appendChild(card);
+    
+    card.addEventListener("click", (event) => {
+        const id = event.currentTarget.dataset.id;
+        loadSingleCard(id);
+    });
 }
 
-const renderElement = (elements) => {
+const renderElements = (elements) => {
     elements.results.map(elem => {
         mountElement(elem);
     });
@@ -50,12 +56,15 @@ const loadCards = async (url, page = 1) => {
     } catch (error) {
         console.log('Error: ', error);
     } finally {
-        setTimeout(() => {
-            loader.classList.toggle('hide');
-        }, 1000);
+        loader.classList.toggle('hide');
     };
 
 };
+
+const loadSingleCard = async (idItem) => {
+    const endpoint = `${BaseURL}/${idItem}`;
+    console.log(endpoint);
+}
 
 const observeLastCard = (observer) => {
     const lastCard = main.lastChild
@@ -76,7 +85,7 @@ const handleNextCards = () => {
             return
         }
         
-        renderElement(cards)
+        renderElements(cards);
         observeLastCard(cardsObserver);
         page += 1
 
@@ -88,9 +97,11 @@ const handleNextCards = () => {
 (async () => {
 
     cards = await loadCards(BaseURL);
-    renderElement(cards);
+    renderElements(cards);
 
     await handleNextCards();
+    // await handleClickCards();
+
 
 })();
 
